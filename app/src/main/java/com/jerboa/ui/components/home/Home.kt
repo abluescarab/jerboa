@@ -35,10 +35,10 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.ViewAgenda
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -484,18 +484,6 @@ fun HomeHeader(
         )
     }
 
-    if (showMoreOptions) {
-        HomeMoreDialog(
-            onDismissRequest = { showMoreOptions = false },
-            onClickRefresh = onClickRefresh,
-            onClickShowPostViewModeDialog = {
-                showMoreOptions = false
-                showPostViewModeOptions = !showPostViewModeOptions
-            },
-            navController = navController,
-        )
-    }
-
     if (showPostViewModeOptions) {
         PostViewModeDialog(
             onDismissRequest = { showPostViewModeOptions = false },
@@ -552,6 +540,37 @@ fun HomeHeader(
                     contentDescription = "TODO",
                 )
             }
+            DropdownMenu(
+                expanded = showMoreOptions,
+                onDismissRequest = { showMoreOptions = false }
+            ) {
+                Column {
+                    IconAndTextDrawerItem(
+                        text = stringResource(R.string.home_refresh),
+                        icon = Icons.Outlined.Refresh,
+                        onClick = {
+                            showMoreOptions = false
+                            onClickRefresh()
+                        },
+                    )
+                    IconAndTextDrawerItem(
+                        text = stringResource(R.string.home_post_view_mode),
+                        icon = Icons.Outlined.ViewAgenda,
+                        onClick = {
+                            showMoreOptions = false
+                            showPostViewModeOptions = !showPostViewModeOptions
+                        },
+                    )
+                    IconAndTextDrawerItem(
+                        text = stringResource(R.string.home_site_info),
+                        icon = Icons.Outlined.Info,
+                        onClick = {
+                            navController.navigate("siteSidebar")
+                            showMoreOptions = false
+                        },
+                    )
+                }
+            }
         },
     )
 }
@@ -573,47 +592,6 @@ fun HomeHeaderPreview() {
         selectedPostViewMode = PostViewMode.Card,
         navController = rememberNavController(),
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-    )
-}
-
-@Composable
-fun HomeMoreDialog(
-    onDismissRequest: () -> Unit,
-    navController: NavController,
-    onClickRefresh: () -> Unit,
-    onClickShowPostViewModeDialog: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        text = {
-            Column {
-                IconAndTextDrawerItem(
-                    text = stringResource(R.string.home_refresh),
-                    icon = Icons.Outlined.Refresh,
-                    onClick = {
-                        onDismissRequest()
-                        onClickRefresh()
-                    },
-                )
-                IconAndTextDrawerItem(
-                    text = stringResource(R.string.home_post_view_mode),
-                    icon = Icons.Outlined.ViewAgenda,
-                    onClick = {
-                        onDismissRequest()
-                        onClickShowPostViewModeDialog()
-                    },
-                )
-                IconAndTextDrawerItem(
-                    text = stringResource(R.string.home_site_info),
-                    icon = Icons.Outlined.Info,
-                    onClick = {
-                        navController.navigate("siteSidebar")
-                        onDismissRequest()
-                    },
-                )
-            }
-        },
-        confirmButton = {},
     )
 }
 
